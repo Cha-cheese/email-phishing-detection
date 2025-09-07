@@ -1,6 +1,7 @@
 # Email Phishing Detection Application
 
 Senior Project –Mae Fah Luang University
+
 Role: Team Lead | Team size: 3 | Status: Under development
 
 
