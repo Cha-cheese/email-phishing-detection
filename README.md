@@ -59,21 +59,21 @@ Role: Team Lead | Team size: 3 | Status: Under development
 
 ## ⚙️ Quick Start
 
- 1. Clone the repository
- `git clone https://github.com/Cha-cheese/email-phishing-detection.git`
- `seniorproject`
+ 1. Clone the repository  
+ `git clone https://github.com/Cha-cheese/email-phishing-detection.git`  
+ `seniorproject`  
 
- 2. Install Node.js dependencies
- `npm install` 
+ 2. Install Node.js dependencies  
+ `npm install`   
  
  3. Run the server
-	- Open a terminal in the server folder:
-	`nodemon server.js`
+	- Open a terminal in the server folder:  
+	`nodemon server.js`  
 	- Open the Flutter simulator / emulator and run the app
 	
- 4. Expose server with Ngrok 
-    `ngrok http 3000`
-    - Copy the Ngrok URL (e.g., `https://<your-ngrok-id>.ngrok-free.app`)
+ 4. Expose server with Ngrok   
+    `ngrok http 3000`  
+    - Copy the Ngrok URL (e.g., `https://<your-ngrok-id>.ngrok-free.app`)  
     - Update the **Authorized redirect URI** in Google Cloud Console
     - Add the Ngrok URL to the `.env` file
 
