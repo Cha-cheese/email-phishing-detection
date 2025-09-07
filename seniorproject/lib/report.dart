@@ -19,14 +19,22 @@ class _ReportState extends State<Report> {
     FlSpot(7, 7),
     FlSpot(8, 4),
     FlSpot(9, 1),
-    FlSpot(10,6),
+    FlSpot(10, 6),
+  ];
+
+  final List<Map<String, dynamic>> emailList = [
+    {'title': 'Maha Settee', 'status': 'Risk', 'color': Colors.red},
+    {'title': 'Thai Tour Partnership', 'status': 'No data', 'color': Colors.orange},
+    {'title': 'Pipo Employment', 'status': 'No url', 'color': Colors.blue},
   ];
 
   @override
   Widget build(BuildContext context) {
+    final filteredEmails = emailList.where((email) => email['status'] == 'Risk').toList();
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF1B263B),
+        backgroundColor: const Color.fromARGB(255, 159, 188, 242),
         title: Center(
           child: Image.asset(
             'assets/images/minilogo.png',
@@ -39,7 +47,7 @@ class _ReportState extends State<Report> {
         children: [
           Positioned.fill(
             child: Opacity(
-              opacity: 0.3,
+              opacity: 0.15,
               child: Image.asset(
                 'assets/images/logo.png',
                 fit: BoxFit.contain,
@@ -48,45 +56,100 @@ class _ReportState extends State<Report> {
           ),
           Column(
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               SizedBox(
-                height: 200,
+                height: 250,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: LineChart(
                     LineChartData(
-                      gridData: FlGridData(show: false),
+                      minY: 0,
+                      gridData: FlGridData(
+                        show: true,
+                        drawVerticalLine: true,
+                        getDrawingHorizontalLine: (value) {
+                          return FlLine(
+                            color: Colors.black.withOpacity(0.3),
+                            strokeWidth: 1,
+                            dashArray: [5, 5],
+                          );
+                        },
+                        getDrawingVerticalLine: (value) {
+                          return FlLine(
+                            color: Colors.black.withOpacity(0.3),
+                            strokeWidth: 1,
+                            dashArray: [5, 5],
+                          );
+                        },
+                      ),
                       titlesData: FlTitlesData(
                         leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true, getTitlesWidget: (value, meta) {
-                            return Text(
-                              value.toInt().toString(),
-                              style: TextStyle(color: Colors.white), // สีขาวในแกน Y
-                            );
-                          }),
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            reservedSize: 40,
+                            getTitlesWidget: (value, meta) {
+                              return Text(
+                                value.toInt().toString(),
+                                style: const TextStyle(color: Colors.black, fontSize: 12),
+                              );
+                            },
+                          ),
                         ),
                         bottomTitles: AxisTitles(
                           sideTitles: SideTitles(
                             showTitles: true,
+                            reservedSize: 30,
                             getTitlesWidget: (value, meta) {
                               return Text(
                                 value.toInt().toString(),
-                                style: TextStyle(color: Colors.white), // สีขาวในแกน X
+                                style: const TextStyle(color: Colors.black, fontSize: 12),
                               );
-                            }
+                            },
                           ),
                         ),
-                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)), // ปิดตัวเลขด้านบนกราฟ
+                        topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       ),
-                      borderData: FlBorderData(show: true, border: Border.all(color: Colors.white)),
+                      borderData: FlBorderData(
+                        show: true,
+                        border: Border.all(color: Colors.black.withOpacity(0.5)),
+                      ),
                       lineBarsData: [
                         LineChartBarData(
                           spots: phishingData,
                           isCurved: true,
-                          color: Colors.white, // เปลี่ยนเส้นเป็นสีขาว
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF42A5F5),
+                              Color(0xFF478DE0),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
                           barWidth: 4,
                           isStrokeCapRound: true,
-                          belowBarData: BarAreaData(show: true, color: Colors.white.withOpacity(0.3)),
+                          belowBarData: BarAreaData(
+                            show: true,
+                            gradient: LinearGradient(
+                              colors: [
+                                const Color(0xFF42A5F5).withOpacity(0.3),
+                                const Color(0xFF478DE0).withOpacity(0.0),
+                              ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
+                          ),
+                          dotData: FlDotData(
+                            show: true,
+                            getDotPainter: (spot, percent, barData, index) {
+                              return FlDotCirclePainter(
+                                radius: 4,
+                                color: Colors.white,
+                                strokeWidth: 2,
+                                strokeColor: Colors.blueAccent,
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -95,11 +158,13 @@ class _ReportState extends State<Report> {
               ),
               Expanded(
                 child: ListView(
-                  children: [
-                    emailCard('Thai Tour Partnership', 'No data', Colors.orange),
-                    emailCard('Maha Settee', 'Risk', Colors.red),
-                    emailCard('Pipo Employment', 'No url', Colors.blue),
-                  ],
+                  children: filteredEmails.map((email) {
+                    return emailCard(
+                      email['title'],
+                      email['status'],
+                      email['color'],
+                    );
+                  }).toList(),
                 ),
               ),
             ],
@@ -116,10 +181,10 @@ class _ReportState extends State<Report> {
       child: Card(
         child: Row(
           children: [
-            Expanded(
+            const Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.email,
                   size: 40,
@@ -135,20 +200,21 @@ class _ReportState extends State<Report> {
                     padding: const EdgeInsets.only(top: 6.0),
                     child: Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                       ),
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 2.0, horizontal: 8.0),
                     decoration: BoxDecoration(
                       color: statusColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       status,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
                       ),
@@ -157,15 +223,13 @@ class _ReportState extends State<Report> {
                 ],
               ),
             ),
-            Expanded(
+            const Expanded(
               flex: 3,
               child: Padding(
-                padding: const EdgeInsets.only(top: 12.0, right: 16.0),
+                padding: EdgeInsets.only(top: 12.0, right: 16.0),
                 child: Column(
                   children: [
-                    Text(
-                      '9:41 AM',
-                    ),
+                    Text('9:41 AM'),
                   ],
                 ),
               ),

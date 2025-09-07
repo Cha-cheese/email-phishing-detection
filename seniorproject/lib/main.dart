@@ -1,12 +1,15 @@
-import 'dart:io'; // Import for exit(0)
+import 'dart:io'; // For Platform
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:seniorproject/email.dart';
-import 'package:seniorproject/help.dart';
-import 'package:seniorproject/report.dart';
-import 'package:seniorproject/url.dart';
+import 'package:app_links/app_links.dart';
+import 'email.dart';
+import 'help.dart';
+import 'report.dart';
+import 'url.dart';
+import 'loginpage.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -18,9 +21,116 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF1B263B),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 159, 188, 242),
       ),
-      home: const MainScreen(),
+      home: const PolicyScreen(), // Start with policy screen
+    );
+  }
+}
+
+class PolicyScreen extends StatefulWidget {
+  const PolicyScreen({super.key});
+
+  @override
+  State<PolicyScreen> createState() => _PolicyScreenState();
+}
+
+class _PolicyScreenState extends State<PolicyScreen> {
+  bool _hasNavigated = false; // ตรวจสอบว่าได้เปลี่ยนหน้าแล้วหรือยัง
+  final AppLinks appLinks = AppLinks();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _showPolicyDialog());
+    _initAppLinks();
+  }
+
+  void _showPolicyDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Privacy Policy'),
+          content: const Text(
+            'By using this app, you agree to our privacy policy. Please read it carefully.',
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LoginPage()),
+                );
+              },
+              child: const Text('I Agree'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (Platform.isAndroid) {
+                  SystemNavigator.pop();
+                } else if (Platform.isIOS) {
+                  exit(0);
+                }
+              },
+              child: const Text('Exit'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _initAppLinks() async {
+    try {
+      // Check the initial link when the app is opened
+      final initialLink = await appLinks.getInitialLink();
+      if (initialLink != null && !_hasNavigated) {
+        final initialLinkString =
+            initialLink.toString(); // Convert Uri to String
+        if (initialLinkString.contains('callback')) {
+          setState(() {
+            _hasNavigated = true; // Set to true when navigation happens
+          });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainScreen()),
+          );
+        }
+      }
+
+      // Listen for incoming app links
+      appLinks.uriLinkStream.listen((Uri? link) {
+        if (link != null && !_hasNavigated) {
+          final linkString = link.toString(); // Convert Uri to String
+          if (linkString.contains('callback')) {
+            setState(() {
+              _hasNavigated = true; // Set to true when navigation happens
+            });
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      const MainScreen()), // Go to the main screen after callback
+            );
+          }
+        }
+      });
+    } catch (error) {
+      print('Error initializing app links: $error');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      backgroundColor: const Color.fromARGB(255, 129, 162, 223),
+      body: Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
     );
   }
 }
@@ -33,48 +143,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showPolicyDialog();
-    });
-  }
-
-  void _showPolicyDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Privacy Policy'),
-          content: const Text(
-            'By using this app, you agree to our privacy policy. Please read it carefully.',
-            style: TextStyle(color: Colors.black),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('I Agree'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (Platform.isAndroid) {
-                  SystemNavigator.pop(); // Closes the app on Android
-                } else if (Platform.isIOS) {
-                  exit(0); // Closes the app on iOS
-                }
-              },
-              child: const Text('Exit'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -98,7 +166,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         bottomNavigationBar: Container(
           decoration: const BoxDecoration(
-            color: Color(0xFF778DA9),
+            color: Color.fromARGB(255, 102, 121, 146),
             border: Border(
               top: BorderSide(color: Colors.white, width: 2),
             ),

@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "basic-auth": "^2.0.1",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "https": "^1.0.0",
+    "multiparty": "^4.2.3"
+  }
+}
