@@ -61,7 +61,7 @@ Role: Team Lead | Team size: 3 | Status: Under development
 
  1. Clone the repository  
  `git clone https://github.com/Cha-cheese/email-phishing-detection.git`  
- `seniorproject`  
+ `cd seniorproject`  
 
  2. Install Node.js dependencies  
  `npm install`   
